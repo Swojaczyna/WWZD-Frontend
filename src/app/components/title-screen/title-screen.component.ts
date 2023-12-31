@@ -8,10 +8,11 @@ import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
   selector: 'app-title-screen',
   standalone: true,
   imports: [MatButtonModule, FontAwesomeModule],
-  host: {class: 'flex flex-col grow relative text-white'},
+  host: {class: 'flex flex-col grow relative text-white main-view'},
   templateUrl: './title-screen.component.html',
   styleUrl: './title-screen.component.scss'
 })
+
 export class TitleScreenComponent {
   iconValue = faChevronRight
   router = inject(Router)

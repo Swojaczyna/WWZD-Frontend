@@ -1,15 +1,25 @@
 <mat-progress-bar mode="determinate" value="40"></mat-progress-bar>
-<div class="grid grid-cols-1 grid-rows-4 md:grid-cols-2 md:grid-rows-2 gap-4">
-    <div class="flex">
-        <canvas id="MyChart">{{area}}</canvas>
+<div class="flex justify-center p-16 calcHeight">
+    <div class="grid grid-cols-1 grid-rows-4 lg:grid-cols-2 lg:grid-rows-2 gap-4 w-full">
+        <div class="flex justify-center items-center">
+            <canvas id="BarChart"></canvas>
+        </div>
+        <div class="flex justify-center items-center">
+            <canvas id="BubbleChart"></canvas>
+        </div>
+        <div class="flex justify-center items-center">
+            <canvas id="RadarChart"></canvas>
+        </div>
+        <div class="flex justify-center items-center">
+            <canvas id="ScatterChart"></canvas>
+        </div>
     </div>
-    <div class="flex">
-        <canvas>{{bar}}</canvas>
-    </div>
-    <div class="flex">
-        <canvas>{{bubble}}</canvas>
-    </div>
-    <div class="flex">
-        <canvas>{{scatter}}</canvas>
+</div>
+
+<div class="flex items-center absolute left-0 bottom-0 top-0 p-4">
+    <div class="rounded-full hover:shadow-leftbutton pointer-events-none transition-all duration-300">
+        <button class="pointer-events-auto" mat-mini-fab color="primary" (click)="router.navigate([''])">
+            <fa-icon [icon]="iconValue"></fa-icon>
+        </button>
     </div>
 </div>

@@ -4,7 +4,12 @@ module.exports = {
     "./src/**/*.{html,ts}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      boxShadow: {
+        'leftbutton': '-120px 0 100px 100px rgba(246, 203, 199, 0.3)',
+        'rightbutton': '120px 0 100px 100px rgba(246, 203, 199, 0.3)',
+      },
+    },
   },
   plugins: [],
 }
