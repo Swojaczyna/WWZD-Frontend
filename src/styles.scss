@@ -56,6 +56,10 @@ $my-theme: mat.define-light-theme((
     view-transition-name: header-view;
 }
 
+.title-shadow {
+    text-shadow: 0 0 40px rgba(246, 203, 199, 0.8);
+}
+
 ::view-transition-old(header-view) {
     animation: 90ms cubic-bezier(0.4, 0, 1, 1) both fade-out,
         300ms cubic-bezier(0.4, 0, 0.2, 1) both slide-to-left;

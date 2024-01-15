@@ -1,0 +1,14 @@
+<h1 mat-dialog-title id="header">Dodawanie utworu</h1>
+<div mat-dialog-content [formGroup]="multipartFormGroup" class="!flex !flex-col gap-4 items-center justify-center">
+    <div class="flex flex-col gap-1 w-full">
+        <span>Pliki!!!!!</span>
+        <input formControlName="file" type="file" id="fileInput">
+    </div>
+    <mat-form-field class="w-full">
+        <mat-label>Textarea</mat-label>
+        <textarea formControlName="songText" matInput></textarea>
+    </mat-form-field>
+</div>
+<div class="flex !justify-end" mat-dialog-actions>
+    <button mat-raised-button color="primary" mat-dialog-close>Potwierdź</button>
+</div>
