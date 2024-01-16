@@ -57,7 +57,11 @@ $my-theme: mat.define-light-theme((
 }
 
 .title-shadow {
-    text-shadow: 0 0 40px rgba(246, 203, 199, 0.8);
+    text-shadow: 0 0 20px rgba(246, 203, 199, 0.4);
+}
+
+.mat-divider {
+    border-top-color: #f0a8a1 !important;
 }
 
 ::view-transition-old(header-view) {

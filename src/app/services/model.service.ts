@@ -13,10 +13,7 @@ export class ModelService {
 
   // MOCKOWY ENDPOINT - czeka na implementację od strony BE
   getAllJobs() {
-    const response = {
-      name: "abc",
-      active: true,
-    }
+    const response = [{ "emotion": "love", "reduced_audio_features": [ [ 7.904686450958252, 6.640691757202148 ] ], "reduced_text_features": [ [ 1.9322983026504517, 2.798635721206665 ] ] }, { "emotion": "hate", "reduced_audio_features": [ [ 5.0379665159, 3.2360037692, 9.8240981092 ] ], "reduced_text_features": [ [ 1.3360433552,2.7668983367,1.7874406571 ] ] }, { "emotion": "normal", "reduced_audio_features": [ [ 4.9528418225, 1.5536162893 ] ], "reduced_text_features": [ [ 1.827666907,2.4657126942 ] ] }, { "emotion": "excited", "reduced_audio_features": [ [ 6.6013675493, 1.7926920898, 2.0805599755 ] ], "reduced_text_features": [ [ 1.9322983026504517, 2.798635721206665 ] ] }]
 
     let obs = new Observable((subscriber) => {
       setTimeout(()=>{

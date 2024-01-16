@@ -7,10 +7,11 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faChevronLeft, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { Chart, ChartTypeRegistry } from 'chart.js/auto';
 import { ModelService } from '../../services/model.service';
-import {MatDialog, MatDialogModule} from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDividerModule } from '@angular/material/divider';
 import { AddDataModalComponent } from '../add-data-modal/add-data-modal.component';
 import { LoaderService } from '../../services/loader.service';
-import { finalize } from 'rxjs';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 
 @Component({
@@ -21,7 +22,9 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
     FontAwesomeModule,
     MatButtonModule,
     MatDialogModule,
-    MatProgressBarModule
+    MatDividerModule,
+    MatProgressBarModule,
+    MatTooltipModule
   ],
   host: { class: 'h-screen header-view' },
   templateUrl: './main-screen.component.html',
@@ -205,12 +208,15 @@ export class MainScreenComponent implements OnInit, AfterViewInit {
   }
 
   openModal() {
-    const sub = this.dialogService.open(AddDataModalComponent)
-      .afterClosed().pipe(
-        finalize(() => {
-          this.loadAllDataIntoCharts()
-          sub.unsubscribe()
-        })
-      ).subscribe()
+    const sub = this.dialogService.open(AddDataModalComponent,
+      {
+        hasBackdrop: true,
+        minWidth: '30%',
+        panelClass: '!bg-gray-800'
+      }
+    ).afterClosed().subscribe((v) => {
+      if (v) { this.loadAllDataIntoCharts() }
+      sub.unsubscribe()
+    })
   }
 }

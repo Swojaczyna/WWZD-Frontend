@@ -2,7 +2,7 @@
 <div mat-dialog-content [formGroup]="multipartFormGroup" class="!flex !flex-col gap-4 items-center justify-center">
     <div class="flex flex-col gap-1 w-full">
         <span>Pliki!!!!!</span>
-        <input formControlName="file" type="file" id="fileInput">
+        <input formControlName="file" type="file" id="fileInput" accept=".mp3" [matTooltip]="'Akceptowany format pliku: .mp3'">
     </div>
     <mat-form-field class="w-full">
         <mat-label>Textarea</mat-label>
@@ -10,5 +10,5 @@
     </mat-form-field>
 </div>
 <div class="flex !justify-end" mat-dialog-actions>
-    <button mat-raised-button color="primary" mat-dialog-close>Potwierdź</button>
+    <button mat-raised-button color="primary" (click)="dialogRef.close(true)">Potwierdź</button>
 </div>

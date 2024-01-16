@@ -1,10 +1,10 @@
 <mat-progress-bar mode="determinate" [@hideShow]="!!progressValue ? 'show-progress' : 'hide-progress'" [value]="progressValue"></mat-progress-bar>
 
-<div class="flex flex-col pl-4 py-16 pr-16 calcHeight">
-    <p class="text-4xl text-white title-shadow ">Uzyskane wartości</p>
-    <div class="flex w-full gap-2 overflow-auto">
+<div class="flex flex-col py-16 pr-32 calcHeight relative">
+    <p class="text-4xl pl-4 text-white title-shadow ">Uzyskane wartości</p>
+    <div class="flex w-full containerHeight gap-2">
     
-        <div class="flex items-center">
+        <div class="flex items-center pl-4">
             <div class="rounded-full hover:shadow-leftbutton pointer-events-none transition-all duration-300">
                 <button class="pointer-events-auto" mat-mini-fab color="primary" (click)="router.navigate([''])">
                     <fa-icon [icon]="chevronLeft"></fa-icon>
@@ -12,26 +12,31 @@
             </div>
         </div>
         
-        <div class="flex grow justify-center">
+        <div class="flex grow justify-center px-72">
             <!-- Komentarz poniżej tutaj! -->
-            <div class="flex flex-col w-full overflow-auto gap-2">
-                <div class="flex h-96 justify-center items-center">
+            <div class="flex flex-col grow overflow-y-auto gap-8 p-24 shadow-canvas customScrollbar">
+                <div class="flex grow justify-center items-center -z-10">
                     <canvas id="BarChart"></canvas>
                 </div>
-                <div class="flex h-96 justify-center items-center">
+                <mat-divider></mat-divider>
+                <div class="flex grow justify-center items-center -z-10">
                     <canvas id="BubbleChart"></canvas>
                 </div>
-                <div class="flex h-96 justify-center items-center">
+                <mat-divider></mat-divider>
+                <div class="flex grow justify-center items-center -z-10">
                     <canvas id="RadarChart"></canvas>
                 </div>
-                <div class="flex h-96 justify-center items-center">
+                <mat-divider></mat-divider>
+                <div class="flex grow justify-center items-center -z-10">
                     <canvas id="ScatterChart"></canvas>
                 </div>
             </div>
         </div>
-        
-        <div class="flex items-end">
-            <button mat-fab color="primary" (click)="openModal()">
+    </div>
+
+    <div class="flex items-end absolute right-0 bottom-0 pr-16 pb-16">
+        <div class="rounded-full hover:shadow-uploadbutton pointer-events-none transition-all duration-300">
+            <button class="pointer-events-auto"  mat-fab color="primary" (click)="openModal()" [matTooltip]="'Wgraj utwór'">
                 <fa-icon [icon]="upload"></fa-icon>
             </button>
         </div>

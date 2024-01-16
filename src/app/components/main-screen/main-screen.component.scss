@@ -1,3 +1,22 @@
 .calcHeight {
     height: calc(100% - 4px);
 }
+
+.containerHeight {
+    height: calc(100% - 3rem - 4px);
+}
+
+.customScrollbar {
+    scrollbar-color: #f0a8a1 #f0a8a100 !important;
+}
+
+.customScrollbar::-webkit-scrollbar
+{
+    width: 6px;
+}
+
+.customScrollbar::-webkit-scrollbar-thumb
+{
+    background-color: #f0a8a1;
+    border-radius: 5px;
+}
