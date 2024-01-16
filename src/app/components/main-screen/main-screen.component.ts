@@ -13,6 +13,9 @@ import { MatDividerModule } from '@angular/material/divider';
 import { AddDataModalComponent } from '../add-data-modal/add-data-modal.component';
 import { LoaderService } from '../../services/loader.service';
 import { animate, state, style, transition, trigger } from '@angular/animations';
+import { forkJoin } from 'rxjs';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { ReducedModelResponse } from '../../interfaces/model';
 
 @Component({
   selector: 'app-main-screen',
@@ -57,16 +60,26 @@ export class MainScreenComponent implements OnInit, AfterViewInit {
   progressValue = 0
 
   barChart!: Chart
-  bubbleChart!: Chart
-  radarChart!: Chart
+  // bubbleChart!: Chart
+  pieChart!: Chart
   scatterChart!: Chart
+  scatterAudioChart!: Chart
 
   ngOnInit(): void {
     // this.modelService.getJobStatus().subscribe()
     this.barChart = this.createChart('BarChart', 'bar', {
-      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+      labels: [],
       datasets: [],
     }, {
+      plugins: {
+        legend: {
+          position: 'top',
+        },
+        title: {
+          display: true,
+          text: 'Wykres ilościowy rozkładu danych tekstowych'
+        }
+      },
       scales: {
         y: {
           beginAtZero: true
@@ -74,45 +87,78 @@ export class MainScreenComponent implements OnInit, AfterViewInit {
       }
     })
 
-    this.bubbleChart = this.createChart('BubbleChart', 'bubble', {
-      datasets: []
-    }, {})
+    // this.bubbleChart = this.createChart('BubbleChart', 'bubble', {
+    //   datasets: []
+    // }, {
+    //   plugins: {
+    //     legend: {
+    //       position: 'top',
+    //     },
+    //     title: {
+    //       display: true,
+    //       text: 'Chart.js Scatter Multi Axis Chart'
+    //     }
+    //   },
+    // })
 
-    this.radarChart = this.createChart('RadarChart', 'radar', {
-      labels: [
-        'Eating',
-        'Drinking',
-        'Sleeping',
-        'Designing',
-        'Coding',
-        'Cycling',
-        'Running'
-      ],
+    this.pieChart = this.createChart('PieChart', 'pie', {
+      labels: [],
       datasets: []
     }, {
-      elements: {
-        line: {
-          borderWidth: 3
+      plugins: {
+        datalabels: {
+          formatter: (value: number, ctx: { chart: { data: { datasets: { data: any; }[]; }; }; }) => {
+              let sum = 0;
+              let dataArr = ctx.chart.data.datasets[0].data;
+              dataArr.map((data: number) => {
+                sum += data;
+              });
+              let percentage = (value*100 / sum).toFixed(2)+"%";
+              return percentage;
+          },
+          color: '#fff',
+          display: function(context: { active: any; }) {
+            return context.active;
+          }
+        },
+        legend: {
+          position: 'top',
+        },
+        title: {
+          display: true,
+          text: 'Wykres procentowy rozkładu danych tekstowych'
         }
       },
-      scales: {
-        r: {
-            min: 0,
-            max: 100,
-          ticks: {
-            stepSize: 10,
-          },
-          pointLabels: {
-            fontSize: 14,
-            display: (ctx: { chart: { width: number; }; }) => ctx.chart.width > 400
-          }
-        }
-      }
-    })
+    },
+    [ChartDataLabels])
 
     this.scatterChart = this.createChart('ScatterChart', 'scatter', {
       datasets: [],
-    }, {})
+    }, {
+      plugins: {
+        legend: {
+          position: 'top',
+        },
+        title: {
+          display: true,
+          text: 'Wykres punktowy rozkładu danych tekstowych'
+        }
+      },
+    })
+
+    this.scatterAudioChart = this.createChart('ScatterAudioChart', 'scatter', {
+      datasets: [],
+    }, {
+      plugins: {
+        legend: {
+          position: 'top',
+        },
+        title: {
+          display: true,
+          text: 'Wykres punktowy rozkładu danych muzycznych'
+        }
+      },
+    })
   }
   
   ngAfterViewInit(): void { this.loadAllDataIntoCharts() }
@@ -121,73 +167,88 @@ export class MainScreenComponent implements OnInit, AfterViewInit {
     this.progressValue = 40
     this.changeDetectorRef.detectChanges()
 
-    this.modelService.getAllJobs().subscribe((t) => {
-      console.log(t)
+    forkJoin([
+      this.modelService.getLyricsFeatures(),
+      this.modelService.getAudioFeatures(),
+      this.modelService.getLyricsEmotions()
+    ]).subscribe(([lyricsF, audioF, lyricsE]) => {
+      let scatterData: { x: number; y: number; label: string; }[] = [];
+      lyricsF.forEach((value: number[], index: number) => {
+        const coordination = {
+          x: value[0],
+          y: value[1],
+          label: lyricsE[index]
+        }
 
+        scatterData.push(coordination)
+      })
+
+      const groupedScatterData = this.groupBy(scatterData, 'label')
+
+      let preparedLabels: any[] | undefined = []
+      let preparedLengthData = []
+      for(const [key, value] of Object.entries(groupedScatterData)) {
+        preparedLabels.push(key)
+        preparedLengthData.push((value as any[]).length)
+
+        this.scatterChart.data.datasets.push({
+          label: key,
+          data: value as any[],
+          // backgroundColor: color
+        });
+      }
+
+      this.barChart.data.labels = preparedLabels
       this.barChart.data.datasets.push({
-        label: '# of Votes',
-        data: [12, 19, 3, 5, 2, 3],
+        label: 'Liczba rekordów',
+        data: preparedLengthData,
         borderWidth: 1,
       })
 
-      this.bubbleChart.data.datasets.push({
-        label: 'First Dataset',
-        data: [{
-          x: 20,
-          y: 30,
-          r: 15
-        }, {
-          x: 40,
-          y: 10,
-          r: 10
-        }],
-        backgroundColor: 'rgb(255, 99, 132)'
+      console.log(this.scatterChart.data.datasets)
+
+      // this.bubbleChart.data.datasets.push({
+      //   label: 'First Dataset',
+      //   data: [{
+      //     x: 20,
+      //     y: 30,
+      //     r: 15
+      //   }, {
+      //     x: 40,
+      //     y: 10,
+      //     r: 10
+      //   }],
+      //   backgroundColor: 'rgb(255, 99, 132)'
+      // })
+
+      this.pieChart.data.labels = preparedLabels
+      this.pieChart.data.datasets.push({
+        label: 'Liczba rekordów',
+        data: preparedLengthData,
+        hoverOffset: 4
       })
 
-      this.radarChart.data.datasets.push({
-        label: 'My First Dataset',
-        data: [65, 59, 90, 81, 56, 55, 40],
-        fill: true,
-        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-        borderColor: 'rgb(255, 99, 132)',
-        pointBackgroundColor: 'rgb(255, 99, 132)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgb(255, 99, 132)'
-      }, {
-        label: 'My Second Dataset',
-        data: [28, 48, 40, 19, 96, 27, 100],
-        fill: true,
-        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-        borderColor: 'rgb(54, 162, 235)',
-        pointBackgroundColor: 'rgb(54, 162, 235)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgb(54, 162, 235)'
+      const test = audioF.map((value: number[]) => {
+        return {x: value[0], y: value[1]}
+      })
+    
+      this.scatterAudioChart.data.datasets.push({
+        label: 'unknown',
+        data: test,
       })
 
-      this.scatterChart.data.datasets.push({
-        label: 'Scatter Dataset',
-        data: [{
-          x: -10,
-          y: 0
-        }, {
-          x: 0,
-          y: 10
-        }, {
-          x: 10,
-          y: 5
-        }, {
-          x: 0.5,
-          y: 5.5
-        }],
-        backgroundColor: 'rgb(255, 99, 132)'
-      });
+      console.log(this.scatterAudioChart.data)
+    
+      console.log(this.scatterAudioChart.data.datasets.forEach(value => value.label))
+
+      console.log(this.barChart.data.datasets[0])
+      console.log(this.pieChart.data.datasets[0])
 
       this.barChart.update()
-      this.bubbleChart.update()
-      this.radarChart.update()
+      // this.bubbleChart.update()
+      this.pieChart.update()
       this.scatterChart.update()
+      this.scatterAudioChart.update()
 
       this.progressValue = 100
       this.changeDetectorRef.detectChanges()
@@ -199,11 +260,12 @@ export class MainScreenComponent implements OnInit, AfterViewInit {
     })
   }
 
-  createChart(id: string, type: keyof ChartTypeRegistry, data: any, options: any) {
+  createChart(id: string, type: keyof ChartTypeRegistry, data: any, options: any, plugins?: any) {
     return new Chart(id, {
       type: type,
       data: data,
       options: options,
+      plugins: plugins
     });
   }
 
@@ -212,11 +274,81 @@ export class MainScreenComponent implements OnInit, AfterViewInit {
       {
         hasBackdrop: true,
         minWidth: '30%',
-        panelClass: '!bg-gray-800'
+        // panelClass: '!bg-gray-800'
       }
     ).afterClosed().subscribe((v) => {
-      if (v) { this.loadAllDataIntoCharts() }
+      if (v) {
+        this.progressValue = 40
+        this.modelService.getJobResult(v.identifier)
+          .subscribe((result: ReducedModelResponse) => {
+            this.progressValue = 100
+            const index = this.barChart.data.labels?.indexOf(result.emotion)!
+
+            console.log(this.barChart.data)
+            console.log(this.pieChart.data)
+            console.log(this.scatterChart.data)
+
+
+            if (index) {
+              const newBarChartDataValue = (this.barChart.data.datasets[0].data[index] as number) + 1;
+              const newPieChartDataValue = (this.pieChart.data.datasets[0].data[index] as number) + 1;
+              
+              this.barChart.data.datasets[0].data[index] = newBarChartDataValue
+              this.pieChart.data.datasets[0].data[index] = newPieChartDataValue
+  
+              this.scatterChart.data.datasets[index].data.push({
+                // label: result.emotion,
+                x: result.reduced_text_features[0],
+                y: result.reduced_text_features[1]
+              });
+
+            } else { }// nigdy nie będzie takiej sytuacji xd 
+
+            console.log(this.scatterAudioChart.data)
+            const indexAudio = this.scatterAudioChart.data.datasets.findIndex(value => value.label == result.emotion)
+
+            if (indexAudio > -1) {
+              this.scatterAudioChart.data.datasets[indexAudio].data.push({
+                // label: result.emotion,
+                x: result.reduced_audio_features[0],
+                y: result.reduced_audio_features[1]
+              });
+            } else {
+              var r = Math.floor(Math.random() * 255);
+              var g = Math.floor(Math.random() * 255);
+              var b = Math.floor(Math.random() * 255);
+              const color = "rgb(" + r + "," + g + "," + b + ")";
+
+              this.scatterAudioChart.data.datasets.push({
+                label: result.emotion,
+                data: [{
+                  x: result.reduced_audio_features[0],
+                  y: result.reduced_audio_features[1]
+                }],
+                backgroundColor: color
+              })
+            }
+
+            this.barChart.update()
+            this.pieChart.update()
+            this.scatterChart.update()
+            this.scatterAudioChart.update()
+
+            setTimeout(() => {
+              this.progressValue = 0
+              this.changeDetectorRef.detectChanges()
+            }, 750)
+          })
+      }
       sub.unsubscribe()
     })
   }
+
+  groupBy(arr: any[], property: string | number) {
+    return arr.reduce(function (memo, x) {
+        if (!memo[x[property]]) { memo[x[property]] = []; }
+        memo[x[property]].push(x);
+        return memo;
+    }, {});
+  };
 }

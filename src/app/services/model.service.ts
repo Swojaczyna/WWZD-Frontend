@@ -1,6 +1,7 @@
-import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, catchError, throwError } from 'rxjs';
+import { Observable, catchError, map, throwError } from 'rxjs';
+import { ReducedModelResponse } from '../interfaces/model';
 
 @Injectable({
   providedIn: 'root'
@@ -27,22 +28,22 @@ export class ModelService {
   getJobResult(id: number) {
     const headers = new HttpHeaders()
 
-    return this.http.get<any>(`${this.apiUrl + '/api/v1/wzw/classified/' + id}`,
+    return this.http.get<ReducedModelResponse>(`${this.apiUrl + '/api/v1/wzw/classified/' + id}`,
       { headers }
     ).pipe(
       catchError((e: HttpErrorResponse) => {
         switch(e.status) {
-          case 404: console.log('dupa')
+          case 404:
         }
         return throwError(() => e)
       })
     )
   }
 
-  getJobStatus() {
+  getJobStatus(id: number) {
     const headers = new HttpHeaders()
     const params = new HttpParams()
-      .set('identifier', '0')
+      .set('identifier', id)
 
     return this.http.get<any>(`${this.apiUrl + '/api/v1/wzw/status'}`,
       {
@@ -52,26 +53,75 @@ export class ModelService {
     ).pipe(
       catchError((e: HttpErrorResponse) => {
         switch(e.status) {
-          case 404: console.log('dupa')
+          case 404:
         }
         return throwError(() => e)
       })
     )
   }
 
-  scheduleAsyncJob() {
+  scheduleAsyncJob(files: any, form: any) {
     const headers = new HttpHeaders()
+    const formData: FormData = new FormData();
+    formData.append('audio', files)
+    formData.append('lyrics', form)
 
-    return this.http.post<number>(`${this.apiUrl + '/api/v1/wzw'}`,
-      undefined,
+    return this.http.post<{identifier: number}>(`${this.apiUrl + '/api/v1/wzw'}`,
+      formData,
       {
         headers,
         observe: 'response'
       }
     ).pipe(
+      map((response: HttpResponse<any>) => response.body),
       catchError((e: HttpErrorResponse) => {
         switch(e.status) {
-          case 404: console.log('dupa')
+          case 404:
+        }
+        return throwError(() => e)
+      })
+    )
+  }
+
+  getLyricsFeatures() {
+    const headers = new HttpHeaders()
+
+    return this.http.get<number[][]>(`${this.apiUrl + '/api/v1/wzw/initial-data/lyrics-features'}`,
+      { headers }
+    ).pipe(
+      catchError((e: HttpErrorResponse) => {
+        switch (e.status) {
+          case 404:
+        }
+        return throwError(() => e)
+      })
+    )
+  }
+
+  getAudioFeatures() {
+    const headers = new HttpHeaders()
+
+    return this.http.get<number[][]>(`${this.apiUrl + '/api/v1/wzw/initial-data/audio-features'}`,
+      { headers }
+    ).pipe(
+      catchError((e: HttpErrorResponse) => {
+        switch (e.status) {
+          case 404:
+        }
+        return throwError(() => e)
+      })
+    )
+  }
+
+  getLyricsEmotions() {
+    const headers = new HttpHeaders()
+
+    return this.http.get<string[]>(`${this.apiUrl + '/api/v1/wzw/initial-data/lyrics-emotions'}`,
+      { headers }
+    ).pipe(
+      catchError((e: HttpErrorResponse) => {
+        switch (e.status) {
+          case 404:
         }
         return throwError(() => e)
       })
