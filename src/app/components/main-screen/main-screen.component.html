@@ -40,7 +40,7 @@
 
     <div class="flex items-end absolute right-0 bottom-0 pr-16 pb-16">
         <div class="rounded-full hover:shadow-uploadbutton pointer-events-none transition-all duration-300">
-            <button class="pointer-events-auto"  mat-fab color="primary" (click)="openModal()" [matTooltip]="'Wgraj utwór'"> 
+            <button class="pointer-events-auto"  mat-fab color="primary" (click)="openModal()" [matTooltip]="'Wgraj utwór'" [disabled]="progressValue > 0"> 
                 <!-- [disabled]="this.progressValue" -->
                 <fa-icon [icon]="upload"></fa-icon>
             </button>

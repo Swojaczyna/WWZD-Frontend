@@ -237,13 +237,6 @@ export class MainScreenComponent implements OnInit, AfterViewInit {
         data: test,
       })
 
-      console.log(this.scatterAudioChart.data)
-    
-      console.log(this.scatterAudioChart.data.datasets.forEach(value => value.label))
-
-      console.log(this.barChart.data.datasets[0])
-      console.log(this.pieChart.data.datasets[0])
-
       this.barChart.update()
       // this.bubbleChart.update()
       this.pieChart.update()
@@ -284,11 +277,6 @@ export class MainScreenComponent implements OnInit, AfterViewInit {
             this.progressValue = 100
             const index = this.barChart.data.labels?.indexOf(result.emotion)!
 
-            console.log(this.barChart.data)
-            console.log(this.pieChart.data)
-            console.log(this.scatterChart.data)
-
-
             if (index) {
               const newBarChartDataValue = (this.barChart.data.datasets[0].data[index] as number) + 1;
               const newPieChartDataValue = (this.pieChart.data.datasets[0].data[index] as number) + 1;
@@ -298,34 +286,35 @@ export class MainScreenComponent implements OnInit, AfterViewInit {
   
               this.scatterChart.data.datasets[index].data.push({
                 // label: result.emotion,
-                x: result.reduced_text_features[0],
-                y: result.reduced_text_features[1]
+                x: result.reduced_text_features[0][0],
+                y: result.reduced_text_features[0][1]
               });
 
             } else { }// nigdy nie będzie takiej sytuacji xd 
 
-            console.log(this.scatterAudioChart.data)
             const indexAudio = this.scatterAudioChart.data.datasets.findIndex(value => value.label == result.emotion)
 
             if (indexAudio > -1) {
               this.scatterAudioChart.data.datasets[indexAudio].data.push({
                 // label: result.emotion,
-                x: result.reduced_audio_features[0],
-                y: result.reduced_audio_features[1]
+                x: result.reduced_audio_features[0][0],
+                y: result.reduced_audio_features[0][1]
               });
             } else {
               var r = Math.floor(Math.random() * 255);
               var g = Math.floor(Math.random() * 255);
               var b = Math.floor(Math.random() * 255);
-              const color = "rgb(" + r + "," + g + "," + b + ")";
+              const colorBorder = "rgb(" + r + "," + g + "," + b + ")";
+              const colorBackground = "rgba(" + r + "," + g + "," + b + "," + 0.5 + ")";
 
               this.scatterAudioChart.data.datasets.push({
                 label: result.emotion,
                 data: [{
-                  x: result.reduced_audio_features[0],
-                  y: result.reduced_audio_features[1]
+                  x: result.reduced_audio_features[0][0],
+                  y: result.reduced_audio_features[0][1]
                 }],
-                backgroundColor: color
+                backgroundColor: colorBackground,
+                borderColor: colorBorder
               })
             }
 
