@@ -135,6 +135,7 @@ export class MainScreenComponent implements OnInit, AfterViewInit {
     this.scatterChart = this.createChart('ScatterChart', 'scatter', {
       datasets: [],
     }, {
+      pointRadius: 0.5,
       plugins: {
         legend: {
           position: 'top',
@@ -149,6 +150,7 @@ export class MainScreenComponent implements OnInit, AfterViewInit {
     this.scatterAudioChart = this.createChart('ScatterAudioChart', 'scatter', {
       datasets: [],
     }, {
+      pointRadius: 0.5,
       plugins: {
         legend: {
           position: 'top',
